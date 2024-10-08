@@ -11,7 +11,7 @@ const DataTable = () => {
   // Función para obtener los datos desde la API
   const fetchData = async () => {
     try {
-      const response = await axios.get('http://localhost:7000');
+      const response = await axios.get('http://3.14.145.155:7000');
       if (response.data.status === 'success') {
         setData(response.data.data);
       }

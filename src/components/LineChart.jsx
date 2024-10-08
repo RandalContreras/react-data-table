@@ -13,7 +13,7 @@ const LineChart = () => {
     // Función para cargar los datos
     const fetchData = async () => {
       try {
-        const response = await axios.get('http://localhost:7000'); // Realiza la solicitud HTTP
+        const response = await axios.get('http://3.14.145.155:7000'); // Realiza la solicitud HTTP
         const data = response.data.data;
 
         // Procesar datos para el gráfico
@@ -21,10 +21,16 @@ const LineChart = () => {
 
         // Configurar opciones del gráfico con los datos procesados
         const options = {
-          title: { text: 'Sensor Data Over Time' },
+          title: { text: '' },
           tooltip: { trigger: 'axis' },
           legend: { data: processedData.legend },
-          grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
+          grid: {
+            left: '3%', 
+            right: '4%', 
+            bottom: '3%', 
+            containLabel: true, 
+            width: '80%',  // Ajustar el ancho del grid para no comprimir los elementos
+          },
           toolbox: { feature: { saveAsImage: {} } },
           xAxis: { type: 'category', boundaryGap: false, data: processedData.dates },
           yAxis: { type: 'value' },
@@ -32,6 +38,20 @@ const LineChart = () => {
         };
 
         chartInstance.setOption(options); // Establecer la configuración del gráfico
+
+        // Ajustar el tamaño del gráfico en caso de redimensionamiento
+        const resizeObserver = new ResizeObserver(() => {
+          chartInstance.resize();
+        });
+
+        // Observar cambios en el contenedor del gráfico
+        resizeObserver.observe(chartRef.current);
+
+        // Limpiar el observador y la instancia del gráfico al desmontar el componente
+        return () => {
+          resizeObserver.disconnect();
+          chartInstance.dispose();
+        };
       } catch (error) {
         console.error('Error al obtener datos del gráfico:', error);
       }
@@ -39,11 +59,6 @@ const LineChart = () => {
 
     // Llamar a la función para cargar los datos
     fetchData();
-
-    // Limpiar la instancia del gráfico en caso de desmontaje del componente
-    return () => {
-      chartInstance.dispose();
-    };
   }, []);
 
   // Función para procesar los datos recibidos del servidor y estructurarlos para el gráfico
@@ -81,7 +96,16 @@ const LineChart = () => {
     return { dates, legend, series };
   };
 
-  return <div ref={chartRef} style={{ width: '100%', height: '400px' }}></div>;
+  return (
+    <div
+      ref={chartRef}
+      style={{
+        width: '1000px', // Ancho fijo para el contenedor del gráfico
+        height: '500px', // Altura fija
+        margin: '0 auto', // Centrar el gráfico en el contenedor
+      }}
+    ></div>
+  );
 };
 
 export default LineChart;
